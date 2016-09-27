@@ -1,0 +1,25 @@
+Data files for paper:
+
+``Gene selection and classification of microarray data using random forest''
+by R. Díaz-Uriarte and S. Alvarez de Andrés.
+
+(See 
+http://ligarto.org/rdiaz/Papers/rfVS/randomForestVarSel.html
+)
+
+
+
+
+*.data.txt: the gene expression data, in genes * subjects arrays.
+*.class.txt: the class indicator.
+
+
+Files are tab separated. The first row of each gene expression data set
+starts with a "#", so watch out what your software does with it.
+
+Everything else should be self-explanatory EXCEPT for:
+xdata2.txt and Class: this is just a small data set to play with.
+
+
+************ Please see the paper and supplementary material for full
+details on data sources.*********** 
