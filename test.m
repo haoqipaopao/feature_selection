@@ -10,12 +10,12 @@ format compact;%数据紧凑
 %%
 folder_now = pwd;
 addpath([folder_now,'\coding for supervised feature selection']);
-addpath([folder_now,'\coding for supervised feature selection\IG']);
+addpath([folder_now,'\coding for supervised feature selection\FScore']);
+addpath([folder_now,'\coding for supervised feature selection\FSLib_v4.0_2016\lib']);
 addpath([folder_now,'\coding for supervised feature selection\FSLib_v4.0_2016\methods']);
-addpath([folder_now,'\coding for supervised feature selection\RFS']);
 addpath([folder_now,'\coding for supervised feature selection\HSICLasso']);
+addpath([folder_now,'\coding for supervised feature selection\RFS']);
 addpath([folder_now, '\data.sets']);
-addpath([folder_now, '\data(no overlap)']);
 
 % 首先载入数据
 data = dlmread('leukemia.data.txt','\t',1,1);
@@ -28,30 +28,36 @@ for i=1:length(classes)
     y(strcmp(label,classes(i))==1)=i;
 end
 
+[ nc_y ] = n2nc( y );
 
-[ranked, info_gains] = infogain(data',y); 
 
-% %调用IG(infogain)函数
-% [rankedi, info_gains] = infogain(data',y);
-% 
-% %调用relief(reliefF)函数：cell和double数据类型都可以跑通
-% % [RANKED, WEIGHT] = reliefF( data',label, 10);
-% [RANKEDr, relieff] = reliefF( data',y, 10);
-% 
-% %mMRM	
-% [RANKEDm, mrmr] = mRMR( data',y, size(data',2));
-% 
-% %RFS聂老师
-% [rankedr, rfs] = RFS_sort(data, y, 10, 1)
-% 
-% % HSICLasso
-% [rankedh,HSIC] = HSICLasso(data,y,2,1);
-% 
-% save ('infogain.mat','rankedi','info_gains');
-% save ('reliefF.mat','RANKEDr','relieff');
-% save ('mRMR.mat','RANKEDm','mrmr');
-% save ('RFS_sort.mat','rankedr','rfs');
-% save ('HSICLasso.mat','rankedh','HSIC');
+numF = size(data, 1);
+ 
+%调用relief(reliefF)函数
+[rankedrf, relieff_weight] = reliefF( data',y, 10);
+
+%mMRM	
+[rankedm, mrmr] = mRMR( data', y, numF);
+
+%RFS聂老师
+[rankedrs, rfs] = RFS_sort(data, nc_y, 1);
+
+% HSICLasso
+[rankedh,hsic] = HSICLasso(data,y,2,1);
+
+%fsvFS
+[ rankedfsv , fsvw] = fsvFS( data', y, numF );
+
+% fisher
+[ ranked_fisher, fisher_feature_value ] = fisher( data',  y);
+
+% 数据保存
+save ('reliefF.mat','rankedrf','relieff_weight');
+save ('mRMR.mat','rankedm','mrmr');
+save ('RFS_sort.mat','rankedrs','rfs');
+save ('HSICLasso.mat','rankedh','hsic');
+save ('fsvFS.mat','rankedfsv','fsvw');
+save ('fisher.mat','ranked_fisher','fisher_feature_value');
 
 
 %% 取元数据的子集
