@@ -1,5 +1,6 @@
 function [accuracy_matrix] = tests(data, label,klist,path,name)
 %%
+path = pwd;
 figure_FontSize=20;
 legend_FondSize=20;
 
@@ -33,7 +34,7 @@ accuracy_matrix(5,:)=testAlgortihm(data,label,rankedm,klist);
 load ('fisher_matric.mat','ranked_fisher','fisher_feature_value');
 accuracy_matrix(6,:)=testAlgortihm(data,label,ranked_fisher,klist);
 
-
+figure;
 hold on;
 lineType={'b-*','r-+','k-o','c-x','g-*','c-.','m-s'};
 labelW={'reliefF','RFS','HSICLasso','fsvFS','mRMR','fisher'};
