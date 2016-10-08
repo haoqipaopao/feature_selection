@@ -1,4 +1,6 @@
 function [ rank , w] = fsvFS( X,Y,numF,alpha )
+%%%X是数据集，nxd，d是features的个数，n是对象个数。
+%%%Y是类标, nx1
 % Matlab Code-Library for Feature Selection
 % Support: Giorgio Roffo email: giorgio.roffo@univr.it
 %  If you use our toolbox please cite our paper:

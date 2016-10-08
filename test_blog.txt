@@ -1,0 +1,6 @@
+wetest.m------程序入口。调用test_ranking  testPerformance.
+test_ranking--------调用我们的算法产生rank
+testPerformance-----画图.
+               -----调用testLibSVM
+
+testLibSVM----------交叉验证产生分类结果

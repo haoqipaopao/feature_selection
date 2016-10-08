@@ -14,6 +14,7 @@ end
 label = y;
 % ‘ÿ»Î ˝æ›
 
+
 load ([path '\' name '_reliefF.mat'],'rankedrf','relieff_weight');
 accuracy_matrix(1,:)=testLibSVM(data,label,rankedrf,klist);
 
@@ -32,11 +33,13 @@ accuracy_matrix(5,:)=testLibSVM(data,label,rankedm,klist);
 load ([path '\' name '_fisher.mat'],'ranked_fisher','fisher_feature_value');
 accuracy_matrix(6,:)=testLibSVM(data,label,ranked_fisher,klist);
 
+load ([path '\' name '_sfcg.mat'],'rankedsfcg','sfcg_W');
+accuracy_matrix(7,:)=testLibSVM(data,label,rankedsfcg,klist);
 
 figure;
 hold on;
 lineType={'b-*','r-+','k-o','c-x','g-*','c-.','m-s'};
-labelW={'reliefF','RFS','HSICLasso','fsvFS','mRMR','fisher'};
+labelW={'reliefF','RFS','HSICLasso','fsvFS','mRMR','fisher','sfcg'};
 for i=1:size(accuracy_matrix,1)
     plot(klist,accuracy_matrix(i,:),lineType{i});
 end

@@ -15,8 +15,7 @@ function [ ranked, feature_value ] = fisher( x_train,  y_train)
 
         % i特征的均值和方差
         fi_mean = mean(x_fi);
-        fi_var = var(x_fi);
-
+        
         % 分子
         sum_1 = 0.0;
         % 分母
