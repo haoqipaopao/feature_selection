@@ -1,4 +1,4 @@
-function [ranked,W]=sfcg(X,Y,m,gamma, norm)
+function [ranked,w]=sfcg(X,Y,gamma, norm)
 % X:d*n
 % Y:n*1
 % norm: 1-L1 norm, 2-L2 norm
@@ -6,23 +6,22 @@ function [ranked,W]=sfcg(X,Y,m,gamma, norm)
 %%%to what in the paper
 %% Problem
 %
-%  min_X  || W(xi-xj)||_22*sij + r * ||S-P||_22+vij*sij
+%  min_X  || w(xi-xj)||_22*sij + r * ||S-A||_22(21)
 
 %%%%%%1, initial S
-NITER=20;
+NITER=50;
+NITER2=10;
 delta=1e-10;
+epsilon=1e-10;
 
-[d num] = size(X);
+[d, num] = size(X);
+
 
 if nargin < 3
-    m=min(d,max(d/2,10));
-end;
-
-if nargin < 4
     gamma = 1;
 end;
 
-if nargin < 5
+if nargin < 4
     norm = 1;
 end;
 
@@ -39,76 +38,57 @@ for i = 1:c
     A(Y==labels(i),Y==labels(i))=1/sum(Y==labels(i));
 end;
 
-S = zeros(num);
-for i = 1:num
-    ad = -distX(i,:)/gamma;
-    S(i,:) = EProjSimplex_new(ad);
-end;
 
-
-S0 = (S+S')/2;
-D0 = diag(sum(S0));
-L0 = D0 - S0;
-[F, ~, evs]=eig1(L0, c, 0);
-
-H = eye(num)-1/num*ones(num);
-St = X*H*X';
-invSt = inv(St);
-M = (X*L0*X');
-W = eig1(M, m, 0, 0);
-
-lambda=gamma;
-
-oldS=zeros(num,num);
+w=ones(d,1)./d;
+oldObj=Inf;
 for iter = 1:NITER
-    distf = L2_distance(F',F');
+    M=repmat(w', [num,1])*X;
     if norm==2
-        distx = L2_distance(W'*X,W'*X);
+        distx = L2_distance(M,M);
     else
-        distx = L1_distance(W'*X,W'*X);
+        distx = L1_distance(M,M);
     end
     
-    oldS=S;
     S = zeros(num);
     if norm==2
         for i=1:num
-            ad = -(distx(i,:)-2*gamma*A(i,:)+2*lambda*distf(i,:))/(2*gamma);
+            ad = -(distx(i,:)-2*gamma*A(i,:))/gamma;
             S(i,:) = EProjSimplex_new(ad);
         end;
     else
-        for i=1:num
-            qi=A(i,:)*diag(oldS(i,:))-distX(i,:)/(2*gamma)-(lambda*distf(i,:))/(2*gamma);
-            ad = -qi./(2*(oldS(i,:)-A(i,:))+delta);
-            S(i,:) = EProjSimplex_new(ad);
-        end;
+        for j=1:NITER2
+            oldS=S;
+            for i=1:num
+                qi=A(i,:)*diag(oldS(i,:))-distX(i,:)/(2*gamma);
+                ad = -qi./(2*(oldS(i,:)-A(i,:))+delta);
+                S(i,:) = EProjSimplex_new(ad);
+            end;
+            if sum(sum(oldS-S))/sum(sum(S))<1e-2
+                break;
+            end
+        end
     end
 
-    S = (S+S')/2;
-    D = diag(sum(S));
-    L = D-S;
-    
-    M = invSt*(X*L*X');
-    W = eig1(M, m, 0, 0);
-    W = W*diag(1./sqrt(diag(W'*W)));
-    
-    F_old = F;
-    [F, ~, ev]=eig1(L, c, 0);
-    evs(:,iter+1) = ev;
+    for l=1:d
+        w(l)=1/(sum(sum(L2_distance(X(l,:),X(l,:)).*S))+epsilon);
+    end
+    w=w/sum(w);    
 
-    fn1 = sum(ev(1:c));
-    fn2 = sum(ev(1:c+1));
-    if fn1 > 0.000000001
-        lambda = 2*lambda;
-    elseif fn2 < 0.00000000001
-        lambda = lambda/2;  F = F_old;
+    
+    M=repmat(w', [num,1])*X;
+    if norm==2
+        obj = sum(sum(L2_distance(M,M).*S))+gamma*F22norm(S,A);
     else
+        obj = sum(sum(L2_distance(M,M).*S))+gamma*L1norm(S,A);
+    end
+    
+    if abs((obj-oldObj)/obj) < 1e-6
         break;
-    end;
+    end
+    oldObj=obj;
+end
 
-end;
-
-fw=sum(W.*W,2);
-[~,ranked] = sort(fw,'descend');
+[~,ranked] = sort(w,'descend');
 
 
 

@@ -13,7 +13,7 @@ folder_now = pwd;
 addpath([folder_now, '\data.sets']);
 
 
-dataName={'srbct'}
+dataName={'lymphoma'}
 for i=1:length(dataName)
     name=dataName{1};
     data = dlmread([name '.data.txt'],'\t',1,1);

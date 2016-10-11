@@ -22,7 +22,7 @@ if isSym == 1
 end;
 [v d] = eig(A);
 d = diag(d);
-%d = real(d);
+d = real(d);
 if isMax == 0
     [d1, idx] = sort(d);
 else
@@ -31,6 +31,6 @@ end;
 
 idx1 = idx(1:c);
 eigval = d(idx1);
-eigvec = v(:,idx1);
+eigvec = real(v(:,idx1));
 
 eigval_full = d(idx);
