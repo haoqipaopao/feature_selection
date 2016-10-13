@@ -25,34 +25,34 @@ numF = 200;
 %调用FeatureSelection函数
 % norm:1 2
 % [ranked,W]=sfcg(X,Y,m,gamma, norm)
-[rankedsfcg,sfcg_W]=sfcg(data',y,200,0.01);
+% [rankedsfcg,sfcg_W]=sfcg(data',y,200,0.01);
 
-% %调用relief(reliefF)函数
-% [rankedrf, relieff_weight] = reliefF( data,y, 10);
-%
-% %RFS聂老师
-% [rankedrs, rfs] = RFS_sort(data', nc_y, 1);
-%
-% % HSICLasso
-% [rankedh,hsic] = HSICLasso(data',y,2,1);
-%
-% %fsvFS
-% [ rankedfsv , fsvw] = fsvFS( data, y, size(data,2),1);
-%
-% % mRMR
-% [rankedm, mrmr] = mRMR( data, y, numF);
-%
-% % fisher
-% [ ranked_fisher, fisher_feature_value ] = fisher( data,y);
-%
-% % 数据保存
-save ([path '\' txtname '_sfcg.mat'],'rankedsfcg','sfcg_W');
-% save ([path '\' txtname '_reliefF.mat'],'rankedrf','relieff_weight');
-% save ([path '\' txtname '_RFS_sort.mat'],'rankedrs','rfs');
-% save ([path  '\' txtname '_HSICLasso.mat'],'rankedh','hsic');
-% save ([path  '\' txtname '_fsvFS.mat'],'rankedfsv','fsvw');
-% save ([path  '\' txtname '_mRMR.mat'],'rankedm','mrmr');
-% save ([path '\' txtname '_fisher.mat'],'ranked_fisher','fisher_feature_value');
+%调用relief(reliefF)函数
+[rankedrf, relieff_weight] = reliefF( data,y, 10);
+
+%RFS聂老师
+[rankedrs, rfs] = RFS_sort(data', nc_y, 1);
+
+% HSICLasso
+[rankedh,hsic] = HSICLasso(data',y,2,1);
+
+%fsvFS
+[ rankedfsv , fsvw] = fsvFS( data, y, size(data,2),1);
+
+% mRMR
+[rankedm, mrmr] = mRMR( data, y, numF);
+
+% fisher
+[ ranked_fisher, fisher_feature_value ] = fisher( data,y);
+
+% 数据保存
+% save ([path '\' txtname '_sfcg.mat'],'rankedsfcg','sfcg_W');
+save ([path '\' txtname '_reliefF.mat'],'rankedrf','relieff_weight');
+save ([path '\' txtname '_RFS_sort.mat'],'rankedrs','rfs');
+save ([path  '\' txtname '_HSICLasso.mat'],'rankedh','hsic');
+save ([path  '\' txtname '_fsvFS.mat'],'rankedfsv','fsvw');
+save ([path  '\' txtname '_mRMR.mat'],'rankedm','mrmr');
+save ([path '\' txtname '_fisher.mat'],'ranked_fisher','fisher_feature_value');
 
 
 %%

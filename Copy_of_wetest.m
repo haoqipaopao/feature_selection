@@ -14,13 +14,14 @@ addpath([folder_now, '\data.sets']);
 addpath([folder_now,'\coding for supervised feature selection']);
 addpath([folder_now,'\coding for supervised feature selection\A supervised feature selection']);
 
-%gamma= [1e-3,1e-2,1e-1,1,10,100]
-gamma= [1e5,2e5,4e5,8e5,1.6e6,3.2e6,6.4e6,1.28e7]
 
+
+gamma= [0.02 0.1 0.5 2.5 12.5 62.5]
+lambda= [1 5 25]
 %m = [1]
 %gamma = [1]
 
-dataName={'lymphoma'}
+dataName={'brain'}
 for i=1:length(dataName)
     name=dataName{i};
     data = dlmread([name '.data.txt'], '\t', 1, 1);
@@ -35,7 +36,7 @@ for i=1:length(dataName)
     label = y;
     
     path = [folder_now '\results\' name ];
-    test_CGFR_ranking(data',label, path, name, gamma);
+    test_CGFR_ranking(data',label, path, name, gamma,lambda);
     testPerformance(data',label,klist,path,name);
     
 end
