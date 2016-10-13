@@ -16,11 +16,11 @@ addpath([folder_now,'\coding for supervised feature selection\A supervised featu
 
 
 m=10:10:100;
-gamma= [1e-4,1e-3,1e-2,1e-1,1,1e1,1e2,1e3,1e4]
+gamma= [1e-3,1e-2,1e-1,1,1e1,1e2]
 %m = [1]
 %gamma = [1]
 
-dataName={'leukemia'}
+dataName={'CNAE-9'}
 for i=1:length(dataName)
     name=dataName{i};
     data = dlmread([name '.data.txt'], '\t', 1, 1);

@@ -1,4 +1,4 @@
-function [] = test_CGFR_ranking(data, label,savePath,txtname,gamma,lambda)
+function [] = test_CGFR_ranking(data, label,savePath,txtname,m,gamma)
 %%
 folder_now = pwd;
 addpath([folder_now, '\data.sets']);
@@ -7,27 +7,23 @@ addpath([folder_now,'\coding for supervised feature selection\A supervised featu
 
 
 klist=[100];
-accuracy2=zeros(length(gamma),length(lambda));
-accuracy1=zeros(length(gamma),length(lambda));
-W32=zeros(length(gamma),length(lambda), size(data, 2));
-W31=zeros(length(gamma),length(lambda), size(data, 2));
-
- for i=1:length(gamma)
-   	for j=1:length(lambda)
-        disp(lambda(j))
-        [rankedsfcg1,w1,~]=sfcg(data',label,gamma(i),lambda(j),1);
-        [rankedsfcg2,w2,~]=sfcg(data',label,gamma(i),lambda(j),2);
-        W31(i,j,:)=w1;
-        W32(i,j,:)=w2;
-        accuracy1(i,j)=testLibSVM(data,label,rankedsfcg1,klist);
-        accuracy2(i,j)=testLibSVM(data,label,rankedsfcg2,klist);
+accuracy=zeros(length(m),length(gamma));
+SW=zeros(length(m),length(gamma), size(data, 2));
+OBJ=zeros(length(m),length(gamma),50);
+ for i=1:length(m)
+   	for j=1:length(gamma)
+        disp(gamma(j))
+        [rankedsfcg,sw,~,obj]=lda_sfcg(data',label,m(i),gamma(j));
+        SW(i,j,:)=sw;
+        OBJ(i,j,:)=obj;
+        accuracy(i,j)=testLibSVM(data,label,rankedsfcg,klist);
    	end
 end
 
 
 %save
-save ([savePath '\' txtname '_sfcg_acc.mat'],'accuracy1','accuracy2');
-save ([savePath '\' txtname '_sfcg.mat'],'W31','W32','rankedsfcg1','rankedsfcg2');
+save ([savePath '\' txtname '_sfcg_acc.mat'],'accuracy');
+save ([savePath '\' txtname '_sfcg.mat'],'SW','rankedsfcg','OBJ');
 
 %plot
 %avg(W22,2)
