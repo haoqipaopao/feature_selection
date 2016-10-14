@@ -1,29 +1,30 @@
-function [ accuracy ] = testLibSVM(data, label,ranked,klist)
+function [ accuracy ] = testLibSVM(data, label,klist,ranked)
 %%
 
 if size(ranked,2)==1
     ranked=ranked';
 end
 
-acc = zeros(size(ranked,1),1);
+accuracy = zeros(size(ranked,1),length(klist));
 
 % cross validation(libsvm)
-for i=1:size(ranked,1)
-    acc2 = zeros(length(klist),1);
-    for j=1: length(klist)
-        k=klist(j);
-        param_str = sprintf('-v 3 -t 2');
-        result = svmtrain(label, data(:,ranked(i,1:k)),param_str);
+param_str = sprintf('-v 3 -t 2');
+for i=1:length(klist)
+    k=klist(i);
+    if k>size(ranked,2)
+        accuracy(:,i)=NaN;
+        continue;
+    end
+    for j=1:size(ranked,1)
+        result = svmtrain(label, data(:,ranked(j,1:k)),param_str);
         if length(result) < 1
-            acc2(j) = nan
+            accuracy(j,i) = nan;
         else
-            acc2(j) = result(1)*0.01;
+            accuracy(j,i) = result(1)*0.01;
+            disp(accuracy(j,i));
         end
     end
-    acc(i) = mean(acc2, 'omitnan');
-    disp(acc(i))
 end
 
-accuracy = mean(acc, 'omitnan');
 
 %%

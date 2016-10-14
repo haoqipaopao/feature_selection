@@ -1,6 +1,6 @@
 function [ranked,SW,W,obj]=lda_sfcg(X,Y,m, gamma)
 % X:d*n
-% c£ºd*m (-- Y)m
+% Y£ºc*1
 % m: projection dimension
 % gamma: regularization parameter
 %%%X is the data set, c (Y) is the class label, the other inputs are coherent
@@ -44,7 +44,7 @@ for iter = 1:NITER
     L = DS - S;
     
     M = (X*L*X'+gamma*D);
-    W = eig2(M, m, 0, 0);
+    W = eig1(M, m, 0, 0);
     
     for i=1:d
         D(i,i)=0.5/sqrt(sum(W(i,:).*W(i,:))+epsilon);
@@ -69,7 +69,7 @@ for iter = 1:NITER
     if iter>1
         if abs((obj(iter)-obj(iter-1))/obj(iter)) < delta
             break;
-        end
+        end 
     end
 end
 
