@@ -1,25 +1,31 @@
-% % plot
+
+
 %% A Little Clean Work
 tic;
 clear;
 clc;
 close all;
 format compact;
-%%
-% ≥ı ºªØ
+folder_now=pwd;
+addpath([folder_now, '\data.sets']);
 
-folder_now = pwd;
-addpath([folder_now,'\results']);
-addpath([folder_now,'\results\brain']);
 
-name = 'lymphoma';
-path = [folder_now '\results\' name ];
-load ([path '\' name '_sfcg_acc.mat'],'accuracy1','accuracy2');
-load ([path '\' name '_sfcg.mat'],'W31','W32','rankedsfcg1','rankedsfcg2');
+dataName={'glass','wine','SPECTF','CNAE-9','Cora_HA_uni','dig1-10_uni','Cora_DS_uni','binalpha_uni','Musk_clean1','WebKB_texas_uni',...
+    'LM','Cora_OS_uni','WebKB_cornell_uni','Cora_PL_uni','Cora_ML_uni','WebKB_washington_uni','WebKB_wisconsin_uni','TDT2_10_uni','Hill_Valley_noise','caltech101_silhouettes_16_uni',...
+    'LSVT','MSRA25_uni','Hill_Valley','uspst_uni','TDT2_20_uni','20news_uni','leukemia','MnistData_05_uni','caltech101_silhouettes_28_uni','Coil20Data_25_uni',...
+    'colon','text1_uni','breast2','srbct','breast3','MnistData_10_uni','brain','lymphoma','nci','TDT2_uni',...
+    'PalmData25_uni','USPSdata_20_uni','motion','adenocarcinoma','prostate','Mpeg7_uni','USPSdata_uni','corel_5k_uni','isolet5', 'vehicle_uni',...
+    'ecoli_uni','yeast_uni','segment_uni'};
+data=[1 9 51];
 
-gamma= [1e5,2e5,4e5,8e5,1.6e6,3.2e6,6.4e6,1.28e7]
 
-CGFRplot(gamma,W31,accuracy1,path,name,1);
-CGFRplot(gamma,W32,accuracy2,path,name,2);
+for i=data
+    name=dataName{i};
+    disp(name);
+    path = [folder_now '\results\' name];
+    load ([path '\' name '_sfcg.mat'],'SW','OBJ','m','gamma');
+    load ([path '\' name '_sfcg_acc.mat'],'acc_llda','klist');
+    plotProperties(m,gamma,klist,SW,OBJ,acc_llda,path,name);
+end
 
-%% 
+ 

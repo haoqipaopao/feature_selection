@@ -1,8 +1,7 @@
-function [accuracy_matrix] = testPerformance(data, label,klist,path,name,algorithm)
+function [accuracy_matrix] = testPerformance(data, y,klist,path,name,algorithm,m)
 %%
 legend_FondSize=20;
-y=label2double(label);
-accuracy_matrix=zeros(8,size(klist,2));
+accuracy_matrix=zeros(9,size(klist,2));
 for alg=algorithm
     switch alg
         case 1
@@ -36,6 +35,11 @@ for alg=algorithm
             save([path '\' name '_fisher_acc.mat'],'fisher_acc'); 
             accuracy_matrix(6,:)=max(fisher_acc,[],1);
         case 7
+            load ([path '\' name '_lda.mat'],'rankedLDA');
+            lda_acc=testLibSVM(data,y,klist,rankedLDA);
+            save ([path '\' name '_lda_acc.mat'],'lda_acc');
+            accuracy_matrix(7,:)=lda_acc;    
+        case 8
             load ([path '\' name '_sfcg.mat'],'rankedsfcg');
             
             % new algorithm
@@ -47,22 +51,23 @@ for alg=algorithm
                     end
                 end
             end
-            save ([path '\' name '_sfcg_acc.mat'],'acc_llda');
+            save ([path '\' name '_sfcg_acc.mat'],'acc_llda','klist');
             for i=1:size(accuracy_matrix,2)
-                accuracy_matrix(7,i)=max(max(acc_llda(:,:,i)));
+                accuracy_matrix(8,i)=max(max(acc_llda(:,:,i)));
             end
-        case 8
+        case 9
             svm_acc=testLibSVM(data,y,[size(data,2)],1:size(data,2));
             save ([path '\' name '_svm_acc.mat'],'svm_acc');
-            accuracy_matrix(8,:)=svm_acc;
+            accuracy_matrix(9,:)=svm_acc;
     end
 end
 
 
 figure;
+title(name);
 hold on;
-lineType={'b-*','r-+','k-o','c-x','g-*','c-.','m-s','c-o'};
-labelW={'reliefF','RFS','HSICLasso','fsvFS','mRMR','fisher','sfcg'};
+lineType={'b-*','r-+','k-o','c-x','g-*','c-.','m-s','c-o','b-o'};
+labelW={'reliefF','RFS','HSICLasso','fsvFS','mRMR','fisher','LDA','lsfs','svm'};
 for i=1:size(accuracy_matrix,1)
     plot(klist,accuracy_matrix(i,:),lineType{i});
 end
@@ -74,11 +79,11 @@ hl=legend(labelW,'Location','NorthOutside');
 set(hl,'Fontsize',legend_FondSize);
 set(hl,'Orientation','horizon');
 set(gca,'ylim',[0 1.2]);
-saveas(hl,[path '\' name '_acc.eps'],'psc2');
-saveas(hl,[path '\' name '_acc.jpg']);
+saveas(hl,[path '\' name '-acc.eps'],'psc2');
+saveas(hl,[path '\' name '-acc.jpg']);
 
 % save
-save([path '\' name '_acc.mat'],'accuracy_matrix');
+save([path '\' name '_acc.mat'],'accuracy_matrix','klist');
 
 
 %%

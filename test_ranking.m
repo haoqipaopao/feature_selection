@@ -1,4 +1,4 @@
-function [] = test_ranking(data, label,path,txtname,algorithm,m,gamma)
+function [] = test_ranking(data, y,path,txtname,algorithm,m,gamma)
 %%
 folder_now = pwd;
 addpath([folder_now,'\coding for supervised feature selection']);
@@ -8,18 +8,25 @@ addpath([folder_now,'\coding for supervised feature selection\FSLib_v4.0_2016\li
 addpath([folder_now,'\coding for supervised feature selection\FSLib_v4.0_2016\methods']);
 addpath([folder_now,'\coding for supervised feature selection\HSICLasso']);
 addpath([folder_now,'\coding for supervised feature selection\RFS']);
+addpath([folder_now,'\function']);
 
 %将标签label中的cell字符串数据转化成double数值型数据
 
-y=label2double(label);
 [ nc_y ] = n2nc( y );
 
 
 %numF = size(data, 2);
 numF = 50;
+if size(data,2)<numF
+    numF=size(data,2);
+end
 
 %调用FeatureSelection函数
 % norm:1 2
+if ~exist([path '\' txtname])
+    mkdir([path '\' txtname]);
+end
+
 for alg=algorithm
     switch alg
         case 1
@@ -40,13 +47,18 @@ for alg=algorithm
             save ([path  '\' txtname '_fsvFS.mat'],'rankedfsv','fsvw');
         case 5
             % mRMR
-            [rankedm, mrmr] = mRMR( data, y, numF);
+            dx=discretize(data',20);
+            [rankedm, mrmr] = mRMR( dx', y, numF);
             save ([path  '\' txtname '_mRMR.mat'],'rankedm','mrmr');
         case 6
             % fisher
             [ranked_fisher, fisher_feature_value ] = fisher(data,y);
             save ([path '\' txtname '_fisher.mat'],'ranked_fisher','fisher_feature_value');
         case 7
+            W=LDA(data',y);
+            [~,rankedLDA] = sort(W,'descend');
+            save ([path '\' txtname '_lda.mat'],'W','rankedLDA');
+        case 8
             rankedsfcg=zeros(length(m),length(gamma),size(data,2));
             SW=zeros(length(m),length(gamma), size(data, 2));
             OBJ=zeros(length(m),length(gamma),50);
@@ -58,7 +70,8 @@ for alg=algorithm
                         rankedsfcg(i,j,:)=rank;
                         SW(i,j,:)=sw;
                         OBJ(i,j,:)=obj;
-                    catch
+                    catch err
+                        disp(err);
                         SW(i,j,:)=NaN;
                         OBJ(i,j,:)=NaN;
                         rankedsfcg(i,j)=NaN;
@@ -67,8 +80,6 @@ for alg=algorithm
             end
             
             %save
-            save ([path '\' txtname '_sfcg.mat'],'SW','rankedsfcg','OBJ');
+            save ([path '\' txtname '_sfcg.mat'],'SW','rankedsfcg','OBJ','m','gamma');
     end
 end
-
-%%

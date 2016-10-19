@@ -8,7 +8,7 @@ end
 accuracy = zeros(size(ranked,1),length(klist));
 
 % cross validation(libsvm)
-param_str = sprintf('-v 3 -t 2');
+param_str = sprintf('-v 5 -t 2');
 for i=1:length(klist)
     k=klist(i);
     if k>size(ranked,2)
