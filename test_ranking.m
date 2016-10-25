@@ -1,13 +1,12 @@
 function [] = test_ranking(data, y,path,txtname,algorithm,m,gamma)
 %%
 folder_now = pwd;
-addpath([folder_now,'\coding for supervised feature selection']);
-addpath([folder_now,'\coding for supervised feature selection\A supervised feature selection']);
-addpath([folder_now,'\coding for supervised feature selection\FScore']);
-addpath([folder_now,'\coding for supervised feature selection\FSLib_v4.0_2016\lib']);
-addpath([folder_now,'\coding for supervised feature selection\FSLib_v4.0_2016\methods']);
-addpath([folder_now,'\coding for supervised feature selection\HSICLasso']);
-addpath([folder_now,'\coding for supervised feature selection\RFS']);
+addpath([folder_now,'\feature selection']);
+addpath([folder_now,'\feature selection\FScore']);
+addpath([folder_now,'\feature selection\FSLib_v4.0_2016\lib']);
+addpath([folder_now,'\feature selection\FSLib_v4.0_2016\methods']);
+addpath([folder_now,'\feature selection\HSICLasso']);
+addpath([folder_now,'\feature selection\RFS']);
 addpath([folder_now,'\function']);
 
 %将标签label中的cell字符串数据转化成double数值型数据
@@ -23,8 +22,8 @@ end
 
 %调用FeatureSelection函数
 % norm:1 2
-if ~exist([path '\' txtname])
-    mkdir([path '\' txtname]);
+if ~exist(path)
+    mkdir(path);
 end
 
 for alg=algorithm
@@ -55,10 +54,39 @@ for alg=algorithm
             [ranked_fisher, fisher_feature_value ] = fisher(data,y);
             save ([path '\' txtname '_fisher.mat'],'ranked_fisher','fisher_feature_value');
         case 7
-            W=LDA(data',y);
-            [~,rankedLDA] = sort(W,'descend');
-            save ([path '\' txtname '_lda.mat'],'W','rankedLDA');
+            %LDA
+            rankedLDA=zeros(length(m),size(data,2));
+            for i=1:length(m)
+                try
+                    W=LDA(data',y,m(i));
+                    SW=sum(W.*W,2);  
+                    [~,rank] = sort(SW,'descend');
+                    rankedLDA(i,:)=rank;
+                catch err
+                    disp(err);
+                    rankedLDA(i,:)=NaN;
+                end
+                
+            end
+            save ([path '\' txtname '_lda.mat'],'rankedLDA');
+            
         case 8
+            %LDFA
+            rankedLDFS=zeros(length(m),size(data,2));
+            for i=1:length(m)
+                try
+                    W=LDFS(data',y,m(i));
+                    SW=sum(W.*W,2);  
+                    [~,rank] = sort(SW,'descend');
+                    rankedLDFS(i,:)=rank;
+                catch err
+                    disp(err);
+                    rankedLDA(i,:)=NaN;
+                end
+                
+            end
+            save ([path '\' txtname '_ldfs.mat'],'rankedLDFS');
+        case 9
             rankedsfcg=zeros(length(m),length(gamma),size(data,2));
             SW=zeros(length(m),length(gamma), size(data, 2));
             OBJ=zeros(length(m),length(gamma),50);
@@ -66,7 +94,7 @@ for alg=algorithm
                 disp(m(i))
                 for j=1:length(gamma)
                     try
-                        [rank,sw,~,obj]=lda_sfcg(data',y,m(i),gamma(j));
+                        [rank,sw,~,obj]=RLDA(data',y,m(i),gamma(j));
                         rankedsfcg(i,j,:)=rank;
                         SW(i,j,:)=sw;
                         OBJ(i,j,:)=obj;
