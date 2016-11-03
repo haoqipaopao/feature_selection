@@ -1,4 +1,0 @@
-m = 1
-glass
-Musk
-ecoli
